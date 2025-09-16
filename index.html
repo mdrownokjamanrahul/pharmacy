@@ -365,6 +365,39 @@
             background-color: #f8f9fa;
         }
 
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -398,6 +431,14 @@
     </style>
 </head>
 <body>
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status">🔄 Connecting...</div>
+    
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading">
+        <div>⏳ Loading...</div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>🏥 ফার্মেসী ম্যানেজমেন্ট সিস্টেম</h1>
@@ -406,7 +447,7 @@
 
         <div class="nav-tabs">
             <button class="tab-button active" onclick="showTab('dashboard')">ড্যাশবোর্ড</button>
-            <button class="tab-button" onclick="showTab('products')">ঔষধ ব্যবস্থাপনা</button>
+            <button class="tab-button" onclick="showTab('products')">ওষধ ব্যবস্থাপনা</button>
             <button class="tab-button" onclick="showTab('sales')">বিক্রয়</button>
             <button class="tab-button" onclick="showTab('inventory')">স্টক</button>
             <button class="tab-button" onclick="showTab('reports')">রিপোর্ট</button>
@@ -420,7 +461,7 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3 id="totalProducts">0</h3>
-                        <p>মোট ঔষধ</p>
+                        <p>মোট ওষধ</p>
                     </div>
                     <div class="stat-card">
                         <h3 id="totalSales">৳0</h3>
@@ -458,12 +499,12 @@
 
             <!-- Products Tab -->
             <div id="products" class="tab-panel">
-                <h2>ঔষধ ব্যবস্থাপনা</h2>
+                <h2>ওষধ ব্যবস্থাপনা</h2>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>ঔষধের নাম</label>
-                        <input type="text" id="productName" placeholder="ঔষধের নাম লিখুন">
+                        <label>ওষধের নাম</label>
+                        <input type="text" id="productName" placeholder="ওষধের নাম লিখুন">
                     </div>
                     <div class="form-group">
                         <label>জেনেরিক নাম</label>
@@ -509,10 +550,10 @@
                     </div>
                 </div>
 
-                <button class="btn" onclick="addProduct()">ঔষধ যুক্ত করুন</button>
+                <button class="btn" onclick="addProduct()">ওষধ যুক্ত করুন</button>
                 <button class="btn btn-success" onclick="updateProduct()" id="updateBtn" style="display: none;">আপডেট করুন</button>
 
-                <input type="text" class="search-box" id="productSearch" placeholder="ঔষধ খুঁজুন..." oninput="searchProducts()">
+                <input type="text" class="search-box" id="productSearch" placeholder="ওষধ খুঁজুন..." oninput="searchProducts()">
 
                 <table class="table">
                     <thead>
@@ -545,10 +586,10 @@
                         </div>
                     </div>
 
-                    <h3>ঔষধ নির্বাচন</h3>
+                    <h3>ওষধ নির্বাচন</h3>
                     <div class="form-group" style="flex:2;"> 
                         <select id="saleProduct" onchange="updateSalePrice()">
-                            <option value="">ঔষধ নির্বাচন করুন</option>
+                            <option value="">ওষধ নির্বাচন করুন</option>
                         </select>
                         <input type="number" id="saleQuantity" placeholder="পরিমাণ" min="1" oninput="updateSalePrice()">
                         <input type="number" id="saleUnitPrice" placeholder="দাম" readonly>
@@ -559,7 +600,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ঔষধ</th>
+                                <th>ওষধ</th>
                                 <th>পরিমাণ</th>
                                 <th>দাম</th>
                                 <th>মোট</th>
@@ -612,7 +653,7 @@
             <div id="inventory" class="tab-panel">
                 <h2>স্টক ব্যবস্থাপনা</h2>
                 
-                <input type="text" class="search-box" id="inventorySearch" placeholder="ঔষধ খুঁজুন..." oninput="searchInventory()">
+                <input type="text" class="search-box" id="inventorySearch" placeholder="ওষধ খুঁজুন..." oninput="searchInventory()">
 
                 <div class="form-row">
                     <button class="btn" onclick="showAllInventory()">সকল স্টক</button>
@@ -623,7 +664,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>ঔষধ</th>
+                            <th>ওষধ</th>
                             <th>কোম্পানি</th>
                             <th>স্টক</th>
                             <th>ইউনিট</th>
@@ -641,7 +682,7 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>শুরুর তারিখ</label>
+                        <label>শুরু তারিখ</label>
                         <input type="date" id="startDate">
                     </div>
                     <div class="form-group">
@@ -733,7 +774,7 @@
                                 <tr>
                                     <th>তারিখ</th>
                                     <th>বিল নং</th>
-                                    <th>ঔষধসমূহ</th>
+                                    <th>ওষধসমূহ</th>
                                     <th>মোট</th>
                                 </tr>
                             </thead>
@@ -750,26 +791,149 @@
         <div id="printContent"></div>
     </div>
 
-    <script>
-        // Data Storage
-        let products = JSON.parse(localStorage.getItem('pharmacy_products') || '[]');
-        let sales = JSON.parse(localStorage.getItem('pharmacy_sales') || '[]');
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getDatabase, ref, set, get, push, remove, onValue, off } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAulRy_pn5v-Ui7YEH6A2N6qVdd0bInl-c",
+            authDomain: "tonmoy-pharmacy.firebaseapp.com",
+            databaseURL: "https://tonmoy-pharmacy-default-rtdb.firebaseio.com",
+            projectId: "tonmoy-pharmacy",
+            storageBucket: "tonmoy-pharmacy.firebasestorage.app",
+            messagingSenderId: "290255187321",
+            appId: "1:290255187321:web:66b6c66a9b6e335dd593a8",
+            measurementId: "G-SGM6QKY5J1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        // Global variables
+        let products = {};
+        let sales = {};
         let currentSaleItems = [];
         let editingProductId = null;
         let currentDiscount = { percent: 0, amount: 0 };
+        let isConnected = false;
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            updateDashboard();
-            loadProductsTable();
-            loadSaleProductOptions();
-            loadInventoryTable();
-            
-            // Set today's date for reports
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
+        // Firebase connection status
+        const connectedRef = ref(database, '.info/connected');
+        onValue(connectedRef, (snapshot) => {
+            const connected = snapshot.val();
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                isConnected = true;
+                statusElement.textContent = '🟢 Connected to Firebase';
+                statusElement.className = 'connection-status connected';
+                loadAllData();
+            } else {
+                isConnected = false;
+                statusElement.textContent = '🔴 Disconnected';
+                statusElement.className = 'connection-status disconnected';
+            }
         });
+
+        // Load all data from Firebase
+        async function loadAllData() {
+            showLoading(true);
+            try {
+                // Load products
+                const productsSnapshot = await get(ref(database, 'products'));
+                products = productsSnapshot.val() || {};
+                
+                // Load sales
+                const salesSnapshot = await get(ref(database, 'sales'));
+                sales = salesSnapshot.val() || {};
+
+                // Update UI
+                updateDashboard();
+                loadProductsTable();
+                loadSaleProductOptions();
+                loadInventoryTable();
+                
+                // Set today's date for reports
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('startDate').value = today;
+                document.getElementById('endDate').value = today;
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showAlert('ডেটা লোড করতে সমস্যা হয়েছে', 'warning');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Firebase save functions
+        async function saveProduct(product) {
+            if (!isConnected) {
+                showAlert('ইন্টারনেট সংযোগ নেই', 'warning');
+                return false;
+            }
+            
+            try {
+                if (product.id) {
+                    await set(ref(database, 'products/' + product.id), product);
+                    products[product.id] = product;
+                } else {
+                    const newProductRef = push(ref(database, 'products'));
+                    product.id = newProductRef.key;
+                    await set(newProductRef, product);
+                    products[product.id] = product;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error saving product:', error);
+                showAlert('ওষধ সেভ করতে সমস্যা হয়েছে', 'warning');
+                return false;
+            }
+        }
+
+        async function deleteProductFromFirebase(productId) {
+            if (!isConnected) {
+                showAlert('ইন্টারনেট সংযোগ নেই', 'warning');
+                return false;
+            }
+
+            try {
+                await remove(ref(database, 'products/' + productId));
+                delete products[productId];
+                return true;
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                showAlert('ওষধ ডিলিট করতে সমস্যা হয়েছে', 'warning');
+                return false;
+            }
+        }
+
+        async function saveSale(sale) {
+            if (!isConnected) {
+                showAlert('ইন্টারনেট সংযোগ নেই', 'warning');
+                return false;
+            }
+
+            try {
+                const newSaleRef = push(ref(database, 'sales'));
+                sale.id = sale.id || newSaleRef.key;
+                await set(newSaleRef, sale);
+                sales[sale.id] = sale;
+                return true;
+            } catch (error) {
+                console.error('Error saving sale:', error);
+                showAlert('বিক্রয় সেভ করতে সমস্যা হয়েছে', 'warning');
+                return false;
+            }
+        }
 
         // Tab Management
         function showTab(tabName) {
@@ -796,7 +960,7 @@
         }
 
         // Product Management
-        function addProduct() {
+        async function addProduct() {
             const name = document.getElementById('productName').value.trim();
             const generic = document.getElementById('genericName').value.trim();
             const company = document.getElementById('company').value.trim();
@@ -817,7 +981,7 @@
             }
 
             const product = {
-                id: Date.now(),
+                id: Date.now().toString(),
                 name,
                 generic,
                 company,
@@ -829,22 +993,22 @@
                 addedDate: new Date().toISOString()
             };
 
-            products.push(product);
-            saveProducts();
-            loadProductsTable();
-            loadSaleProductOptions();
-            clearProductForm();
-            updateDashboard();
-            
-            showAlert('ঔষধ সফলভাবে যুক্ত হয়েছে', 'success');
+            const success = await saveProduct(product);
+            if (success) {
+                loadProductsTable();
+                loadSaleProductOptions();
+                clearProductForm();
+                updateDashboard();
+                showAlert('ওষধ সফলভাবে যুক্ত হয়েছে', 'success');
+            }
         }
 
         function editProduct(id) {
-            const product = products.find(p => p.id === id);
+            const product = products[id];
             if (!product) return;
 
             document.getElementById('productName').value = product.name;
-            document.getElementById('genericName').value = product.generic;
+            document.getElementById('genericName').value = product.generic || '';
             document.getElementById('company').value = product.company;
             document.getElementById('buyPrice').value = product.buyPrice;
             document.getElementById('sellPrice').value = product.sellPrice;
@@ -856,7 +1020,7 @@
             document.getElementById('updateBtn').style.display = 'inline-block';
         }
 
-        function updateProduct() {
+        async function updateProduct() {
             if (!editingProductId) return;
 
             const name = document.getElementById('productName').value.trim();
@@ -873,41 +1037,40 @@
                 return;
             }
 
-            const productIndex = products.findIndex(p => p.id === editingProductId);
-            if (productIndex !== -1) {
-                products[productIndex] = {
-                    ...products[productIndex],
-                    name,
-                    generic,
-                    company,
-                    buyPrice,
-                    sellPrice,
-                    stock,
-                    expiryDate,
-                    unit
-                };
+            const product = {
+                ...products[editingProductId],
+                name,
+                generic,
+                company,
+                buyPrice,
+                sellPrice,
+                stock,
+                expiryDate,
+                unit
+            };
 
-                saveProducts();
+            const success = await saveProduct(product);
+            if (success) {
                 loadProductsTable();
                 loadSaleProductOptions();
                 clearProductForm();
                 updateDashboard();
-                
-                showAlert('ঔষধ সফলভাবে আপডেট হয়েছে', 'success');
+                showAlert('ওষধ সফলভাবে আপডেট হয়েছে', 'success');
             }
 
             editingProductId = null;
             document.getElementById('updateBtn').style.display = 'none';
         }
 
-        function deleteProduct(id) {
-            if (confirm('এই ঔষধটি ডিলিট করতে চান?')) {
-                products = products.filter(p => p.id !== id);
-                saveProducts();
-                loadProductsTable();
-                loadSaleProductOptions();
-                updateDashboard();
-                showAlert('ঔষধ ডিলিট হয়েছে', 'success');
+        async function deleteProduct(id) {
+            if (confirm('এই ওষধটি ডিলিট করতে চান?')) {
+                const success = await deleteProductFromFirebase(id);
+                if (success) {
+                    loadProductsTable();
+                    loadSaleProductOptions();
+                    updateDashboard();
+                    showAlert('ওষধ ডিলিট হয়েছে', 'success');
+                }
             }
         }
 
@@ -926,7 +1089,7 @@
             const tbody = document.getElementById('productsTable');
             tbody.innerHTML = '';
 
-            products.forEach(product => {
+            Object.values(products).forEach(product => {
                 const isLowStock = product.stock <= 10;
                 const isExpired = new Date(product.expiryDate) < new Date();
                 
@@ -941,15 +1104,15 @@
                     <td>${product.stock} ${product.unit}</td>
                     <td>${formatDate(product.expiryDate)}</td>
                     <td>
-                        <button class="btn" onclick="editProduct(${product.id})">সম্পাদনা</button>
-                        <button class="btn btn-danger" onclick="deleteProduct(${product.id})">ডিলিট</button>
+                        <button class="btn" onclick="editProduct('${product.id}')">সম্পাদনা</button>
+                        <button class="btn btn-danger" onclick="deleteProduct('${product.id}')">ডিলিট</button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
 
-            if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">কোন ঔষধ পাওয়া যায়নি</td></tr>';
+            if (Object.keys(products).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">কোন ওষধ পাওয়া যায়নি</td></tr>';
             }
         }
 
@@ -971,9 +1134,9 @@
         // Sales Management
         function loadSaleProductOptions() {
             const select = document.getElementById('saleProduct');
-            select.innerHTML = '<option value="">ঔষধ নির্বাচন করুন</option>';
+            select.innerHTML = '<option value="">ওষধ নির্বাচন করুন</option>';
 
-            products.forEach(product => {
+            Object.values(products).forEach(product => {
                 if (product.stock > 0 && new Date(product.expiryDate) > new Date()) {
                     const option = document.createElement('option');
                     option.value = product.id;
@@ -988,7 +1151,7 @@
             const quantity = parseInt(document.getElementById('saleQuantity').value) || 0;
             
             if (productId) {
-                const product = products.find(p => p.id == productId);
+                const product = products[productId];
                 if (product) {
                     document.getElementById('saleUnitPrice').value = product.sellPrice;
                     document.getElementById('saleTotal').value = product.sellPrice * quantity;
@@ -1004,11 +1167,11 @@
             const quantity = parseInt(document.getElementById('saleQuantity').value);
             
             if (!productId || !quantity || quantity <= 0) {
-                alert('ঔষধ ও পরিমাণ সঠিকভাবে নির্বাচন করুন');
+                alert('ওষধ ও পরিমাণ সঠিকভাবে নির্বাচন করুন');
                 return;
             }
 
-            const product = products.find(p => p.id == productId);
+            const product = products[productId];
             if (!product) return;
 
             if (quantity > product.stock) {
@@ -1017,7 +1180,7 @@
             }
 
             // Check if product already in sale
-            const existingItemIndex = currentSaleItems.findIndex(item => item.productId == productId);
+            const existingItemIndex = currentSaleItems.findIndex(item => item.productId === productId);
             
             if (existingItemIndex !== -1) {
                 currentSaleItems[existingItemIndex].quantity += quantity;
@@ -1069,7 +1232,7 @@
         }
 
         function clearSaleForm() {
-            document.getElementById('saleProductSearch').value = '';
+            document.getElementById('saleProduct').value = '';
             document.getElementById('saleQuantity').value = '';
             document.getElementById('saleUnitPrice').value = '';
             document.getElementById('saleTotal').value = '';
@@ -1122,7 +1285,7 @@
             }
         }
 
-        function completeSale() {
+        async function completeSale() {
             if (currentSaleItems.length === 0) {
                 alert('কোন পণ্য নির্বাচিত নেই');
                 return;
@@ -1138,14 +1301,19 @@
             let totalProfit = 0;
 
             // Update stock and calculate totals
-            currentSaleItems.forEach(item => {
-                const productIndex = products.findIndex(p => p.id == item.productId);
-                if (productIndex !== -1) {
-                    products[productIndex].stock -= item.quantity;
+            for (const item of currentSaleItems) {
+                const product = products[item.productId];
+                if (product) {
+                    product.stock -= item.quantity;
+                    await saveProduct(product);
+                    totalProfit += (item.unitPrice - item.buyPrice) * item.quantity;
                 }
-                totalProfit += (item.unitPrice - item.buyPrice) * item.quantity;
-            });
+            }
 
+            // সঠিক লাভ হিসাব: মোট লাভ থেকে ছাড়ের অংশানুপাতিক লাভ বিয়োগ
+            const profitMarginPercent = totalProfit / subTotal; // লাভের শতাংশ
+            const actualProfit = (finalTotal - (currentSaleItems.reduce((sum, item) => sum + (item.buyPrice * item.quantity), 0)));
+            
             const sale = {
                 id: saleId,
                 date: saleDate,
@@ -1155,37 +1323,56 @@
                 subTotal: subTotal,
                 discount: currentDiscount,
                 totalAmount: finalTotal,
-                totalProfit: totalProfit - currentDiscount.amount
+                totalProfit: actualProfit
             };
 
-            sales.push(sale);
-            saveSales();
-            saveProducts();
+           const success = await saveSale(sale);
+                if (success) {
+                // Clear sale form
+                currentSaleItems = [];
+                currentDiscount = { percent: 0, amount: 0 };
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                clearDiscount();
+                loadSaleItemsTable();
+                calculateTotals();
+    
+                // Update all relevant UI sections
+                updateDashboard();
+                loadProductsTable(); // Products table এ stock update দেখানোর জন্য
+                loadSaleProductOptions(); // Sale options এ stock update দেখানোর জন্য
+                loadInventoryTable(); // Inventory table এ stock update দেখানোর জন্য
 
-            // Clear sale form
-            currentSaleItems = [];
-            currentDiscount = { percent: 0, amount: 0 };
-            document.getElementById('customerName').value = '';
-            document.getElementById('customerPhone').value = '';
-            clearDiscount();
-            loadSaleItemsTable();
-            calculateTotals();
-            updateDashboard();
-
-            alert(`বিক্রয় সম্পন্ন হয়েছে!\nবিল নং: ${saleId}\nসাব-টোটাল: ৳${subTotal}\nছাড়: ৳${currentDiscount.amount}\nসর্বমোট: ৳${finalTotal}`);
+                alert(`বিক্রয় সম্পন্ন হয়েছে!...`);
+           }
         }
+
+        // Make functions global
+        window.showTab = showTab;
+        window.addProduct = addProduct;
+        window.editProduct = editProduct;
+        window.updateProduct = updateProduct;
+        window.deleteProduct = deleteProduct;
+        window.searchProducts = searchProducts;
+        window.updateSalePrice = updateSalePrice;
+        window.addToSale = addToSale;
+        window.removeFromSale = removeFromSale;
+        window.calculateDiscount = calculateDiscount;
+        window.applyDiscount = applyDiscount;
+        window.clearDiscount = clearDiscount;
+        window.completeSale = completeSale;
 
         // Inventory Management
         function loadInventoryTable() {
             const tbody = document.getElementById('inventoryTable');
             tbody.innerHTML = '';
 
-            products.forEach(product => {
+            Object.values(products).forEach(product => {
                 const isLowStock = product.stock <= 10;
                 const isExpired = new Date(product.expiryDate) < new Date();
                 
                 let status = 'স্বাভাবিক';
-                let statusClass = '';
+                let statusClass = 'stock';
                 
                 if (isExpired) {
                     status = 'মেয়াদোত্তীর্ণ';
@@ -1209,7 +1396,7 @@
                 tbody.appendChild(row);
             });
 
-            if (products.length === 0) {
+            if (Object.keys(products).length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">কোন পণ্য পাওয়া যায়নি</td></tr>';
             }
         }
@@ -1237,7 +1424,7 @@
             const tbody = document.getElementById('inventoryTable');
             tbody.innerHTML = '';
 
-            const lowStockProducts = products.filter(p => p.stock <= 10);
+            const lowStockProducts = Object.values(products).filter(p => p.stock <= 10);
 
             lowStockProducts.forEach(product => {
                 const row = document.createElement('tr');
@@ -1263,7 +1450,7 @@
             const tbody = document.getElementById('inventoryTable');
             tbody.innerHTML = '';
 
-            const expiredProducts = products.filter(p => new Date(p.expiryDate) < new Date());
+            const expiredProducts = Object.values(products).filter(p => new Date(p.expiryDate) < new Date());
 
             expiredProducts.forEach(product => {
                 const row = document.createElement('tr');
@@ -1285,6 +1472,13 @@
             }
         }
 
+        // Make inventory functions global
+        window.loadInventoryTable = loadInventoryTable;
+        window.searchInventory = searchInventory;
+        window.showAllInventory = showAllInventory;
+        window.showLowStock = showLowStock;
+        window.showExpired = showExpired;
+
         // Customer Reports
         function loadCustomersList() {
             const customerList = document.getElementById('customerList');
@@ -1302,7 +1496,7 @@
 
             // Get unique customers
             const customers = {};
-            sales.forEach(sale => {
+            Object.values(sales).forEach(sale => {
                 const key = sale.customer.toLowerCase() + '_' + sale.phone;
                 if (sale.customer.toLowerCase().includes(searchTerm) || sale.phone.includes(searchTerm)) {
                     if (!customers[key]) {
@@ -1360,7 +1554,7 @@
             tbody.innerHTML = '';
 
             customer.sales.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(sale => {
-                const medicines = sale.items.map(item => `${item.name} (${item.quantity})`).join(', ');
+                const medicines = sale.items.map(item => `${item.name}`).join(', ');
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -1387,7 +1581,7 @@
             const printContent = `
                 <div style="font-family: Arial, sans-serif; padding: 20px;">
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <h1>🏥 ফার্মেসী ম্যানেজমেন্ট সিস্টেম</h1>
+                        <h1>🏥 তন্ময় ফার্মেসী ম্যানেজমেন্ট সিস্টেম</h1>
                         <h2>${customerName}</h2>
                         <p>প্রিন্ট তারিখ: ${formatDateTime(new Date().toISOString())}</p>
                     </div>
@@ -1422,20 +1616,26 @@
             window.print();
         }
 
+        // Make customer functions global
+        window.loadCustomersList = loadCustomersList;
+        window.searchCustomers = searchCustomers;
+        window.showCustomerReport = showCustomerReport;
+        window.printCustomerReport = printCustomerReport;
+
         // Dashboard
         function updateDashboard() {
             // Update statistics
-            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('totalProducts').textContent = Object.keys(products).length;
             
             const today = new Date().toDateString();
-            const todaySales = sales.filter(sale => new Date(sale.date).toDateString() === today);
+            const todaySales = Object.values(sales).filter(sale => new Date(sale.date).toDateString() === today);
             const todayTotal = todaySales.reduce((sum, sale) => sum + sale.totalAmount, 0);
             document.getElementById('totalSales').textContent = '৳' + todayTotal;
 
-            const lowStockCount = products.filter(p => p.stock <= 10).length;
+            const lowStockCount = Object.values(products).filter(p => p.stock <= 10).length;
             document.getElementById('lowStockCount').textContent = lowStockCount;
 
-            const expiredCount = products.filter(p => new Date(p.expiryDate) < new Date()).length;
+            const expiredCount = Object.values(products).filter(p => new Date(p.expiryDate) < new Date()).length;
             document.getElementById('expiredCount').textContent = expiredCount;
 
             // Show alerts
@@ -1449,20 +1649,20 @@
             const alertsDiv = document.getElementById('alerts');
             alertsDiv.innerHTML = '';
 
-            const lowStockProducts = products.filter(p => p.stock <= 10);
-            const expiredProducts = products.filter(p => new Date(p.expiryDate) < new Date());
+            const lowStockProducts = Object.values(products).filter(p => p.stock <= 10);
+            const expiredProducts = Object.values(products).filter(p => new Date(p.expiryDate) < new Date());
 
             if (expiredProducts.length > 0) {
                 const alert = document.createElement('div');
                 alert.className = 'alert alert-warning';
-                alert.innerHTML = `<strong>সতর্কতা!</strong> ${expiredProducts.length}টি ঔষধের মেয়াদ শেষ হয়ে গেছে।`;
+                alert.innerHTML = `<strong>সতর্কতা!</strong> ${expiredProducts.length}টি ওষধের মেয়াদ শেষ হয়ে গেছে।`;
                 alertsDiv.appendChild(alert);
             }
 
             if (lowStockProducts.length > 0) {
                 const alert = document.createElement('div');
                 alert.className = 'alert alert-warning';
-                alert.innerHTML = `<strong>সতর্কতা!</strong> ${lowStockProducts.length}টি ঔষধের স্টক কম।`;
+                alert.innerHTML = `<strong>সতর্কতা!</strong> ${lowStockProducts.length}টি ওষধের স্টক কম।`;
                 alertsDiv.appendChild(alert);
             }
         }
@@ -1471,7 +1671,7 @@
             const tbody = document.getElementById('recentSales');
             tbody.innerHTML = '';
 
-            const recentSales = sales.slice(-5).reverse(); // Last 5 sales
+            const recentSales = Object.values(sales).slice(-5).reverse(); // Last 5 sales
 
             recentSales.forEach(sale => {
                 const row = document.createElement('tr');
@@ -1489,17 +1689,20 @@
             }
         }
 
+        // Make dashboard functions global
+        window.updateDashboard = updateDashboard;
+
         // Reports
         function generateReport() {
             const startDate = new Date(document.getElementById('startDate').value);
             const endDate = new Date(document.getElementById('endDate').value);
             
             if (startDate > endDate) {
-                alert('শুরুর তারিখ শেষ তারিখের পরে হতে পারে না');
+                alert('শুরু তারিখ শেষ তারিখের পরে হতে পারে না');
                 return;
             }
 
-            const filteredSales = sales.filter(sale => {
+            const filteredSales = Object.values(sales).filter(sale => {
                 const saleDate = new Date(sale.date);
                 return saleDate >= startDate && saleDate <= endDate;
             });
@@ -1535,6 +1738,9 @@
             }
         }
 
+        // Make report functions global
+        window.generateReport = generateReport;
+
         // Utility Functions
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -1544,14 +1750,6 @@
         function formatDateTime(dateString) {
             const date = new Date(dateString);
             return date.toLocaleString('bn-BD');
-        }
-
-        function saveProducts() {
-            localStorage.setItem('pharmacy_products', JSON.stringify(products));
-        }
-
-        function saveSales() {
-            localStorage.setItem('pharmacy_sales', JSON.stringify(sales));
         }
 
         function showAlert(message, type = 'success') {
@@ -1569,6 +1767,13 @@
                 alertDiv.remove();
             }, 3000);
         }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Firebase will auto-connect and load data via the connection listener
+            console.log('Pharmacy Management System initialized with Firebase');
+        });
+
     </script>
 </body>
 </html>
